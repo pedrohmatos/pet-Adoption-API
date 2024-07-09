@@ -1,77 +1,66 @@
 import { Request, Response } from "express";
 import TipoPet from "../types/TipoPet.js";
 import Especies from "../enum/EnumEspecie.js";
-import geradorDeId from "../util/geraId.js";
+import PetRepository from "../repositories/PetRepository.js";
+import AppDataSource from "../config/fonteDados.js";
+import PetEntity from "../entity/PetEntity.js";
 
-let listaDePets: TipoPet[] = [];
+const petRepository = new PetRepository(AppDataSource.getRepository(PetEntity));
 
 class PetController {
 
-    static listaPet(req: Request, res: Response) {
-        res.status(200).json(listaDePets);
-    }
-
-    static encontraPetPorId(req: Request, res: Response) {
-        const identificador: string = req.params.id;
-
-        const petIdentificado: TipoPet | undefined = listaDePets.find((el) => el.id === Number(identificador));
-
-        if (petIdentificado === undefined) {
-            res.status(404).json({ mensagem: "Pet não encontrado", pet: petIdentificado });
-        }
-
-        return res.status(200).json({ mensagem: "Pet encontrado com sucesso", pet: petIdentificado });
-    }
-
-    static criaPet(req: Request, res: Response) {
-        const { id, nome, idade, especie, adotado } = <TipoPet>req.body;
+    static async criaPet(req: Request, res: Response) {
+        const { nome, idade, especie, adotado } = <TipoPet>req.body;
 
         if (!Object.values(Especies).includes(especie)) {
             return res.status(404).json({ erro: "Especie inválida" });
         }
 
-        const novoPet = {
-            id: geradorDeId(listaDePets),
-            nome,
-            idade,
-            especie,
-            adotado
-        };
+        const novoPet = new PetEntity(nome, especie, idade, adotado);
 
-        listaDePets.push(novoPet);
+        await petRepository.cria(novoPet);
 
         return res.status(201).json(novoPet);
     }
 
-    static atualizaPet(req: Request, res: Response) {
-        const identificador: string = req.params.id;
-        const { id, nome, idade, especie, adotado } = <TipoPet>req.body;
-
-        const petIdentificado: TipoPet | undefined = listaDePets.find((el) => el.id === Number(identificador));
-
-        if (petIdentificado === undefined) {
-            return res.status(404).json({ mensagem: "Pet não encontrado", pet: petIdentificado });
-        }
-
-        petIdentificado.nome = nome;
-        petIdentificado.idade = idade;
-        petIdentificado.especie = especie;
-        petIdentificado.adotado = adotado;
-
-        return res.status(200).json({ mensagem: "Pet atualizado com sucesso", pet: petIdentificado });
+    static async listaPet(req: Request, res: Response) {
+        const listaDePets = await petRepository.lista();
+        return res.status(200).json(listaDePets);
     }
 
-    static deletarPet(req: Request, res: Response) {
-        const identificador: string = req.params.id;
-        const petIdentificado: number = listaDePets.findIndex((el) => el.id === Number(identificador));
+    static async atualizaPet(req: Request, res: Response) {
+        const numIdentificador: number = Number(req.params.id);
 
-        if (petIdentificado < 1) {
-            return res.status(404).json({ mensagem: "Pet não encontrado", pet: petIdentificado });
+        const mudancasNoPet: TipoPet = req.body;
+
+        try {
+            const novoPet: TipoPet = await petRepository.atualiza(numIdentificador, mudancasNoPet);
+            return res.status(200).json({ mensagem: `Atualizado com sucesso`, pet: novoPet });
+        } catch (erro) {
+            return res.status(400).json({ mensagem: erro });
         }
+    }
 
-        listaDePets.splice(petIdentificado, 1);
+    static async deletarPet(req: Request, res: Response) {
+        const numIdentificador: number = Number(req.params.id);
 
-        res.status(200).json({ mensagem: "Pet deletado com sucesso", pet: listaDePets[petIdentificado - 1] });
+        try {
+            const petRemovido: TipoPet = await petRepository.deleta(numIdentificador);
+            res.status(200).json({ mensagem: `Pet removido com sucesso`, pet: petRemovido });
+        } catch (erro) {
+            res.status(400).json({ mensagem: erro });
+        }
+    }
+
+    static async encontraPetPorId(req: Request, res: Response) {
+        const numIdentificador: number = Number(req.params.id);
+
+        try {
+            const petIdentificado = await petRepository.encontra(numIdentificador);
+            res.status(200).json({ mensagem: "Pet encontrado com sucesso", pet: petIdentificado });
+        } catch (erro) {
+            res.status(400).json({ mensagem: erro });
+        }
     }
 }
 

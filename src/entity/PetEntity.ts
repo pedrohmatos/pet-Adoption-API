@@ -5,20 +5,30 @@ import Especies from "../enum/EnumEspecie.js";
 class PetEntity {
     @PrimaryGeneratedColumn()
     id!: number;
+
     @Column()
     nome: string;
+
     @Column()
     especie: Especies;
+
     @Column()
     idade: number;
+
     @Column()
     adotado: boolean;
 
-    constructor(nome:string, especie:Especies, idade:number, adotado:boolean) {
-        this.nome = nome;
-        this.especie = especie;
-        this.idade = idade;
-        this.adotado = adotado;
+    constructor
+        (
+            nomeRecebido: string,
+            especieRecebida: Especies,
+            idadeRecebida: number,
+            adotadoRecebido: boolean
+        ) {
+        this.nome = nomeRecebido;
+        this.especie = especieRecebida;
+        this.idade = idadeRecebida;
+        this.adotado = adotadoRecebido;
     }
 }
 
