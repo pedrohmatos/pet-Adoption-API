@@ -48,7 +48,7 @@ class AdotanteRepository implements IAdotanteRepository {
             throw new Error().message = `Não foi encontrada nenhuma pessoa adotante com o id: ${receivedId}`;
         }
 
-        await this.repository.delete(adotanteIdentificado);
+        await this.repository.remove(adotanteIdentificado);
     }
 }
 
