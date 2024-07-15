@@ -1,10 +1,11 @@
 import { DataSource } from "typeorm";
 import PetEntity from "../entity/PetEntity.js";
+import AdotanteEntity from "../entity/AdotanteEntity.js";
 
 const AppDataSource = new DataSource({
     type: "sqlite",
     database: "./src/config/database.sqlite",
-    entities: [PetEntity],
+    entities: [PetEntity, AdotanteEntity],
     synchronize: true
 });
 
