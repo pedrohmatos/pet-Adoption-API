@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import TipoAdotante from "../types/TipoAdotante.js";
 import AdotanteRepository from "../repositories/AdotanteRepository.js";
 import AppDataSource from "../config/fonteDados.js";
 import AdotanteEntity from "../entity/AdotanteEntity.js";
@@ -8,7 +7,7 @@ const adotanteRepository = new AdotanteRepository(AppDataSource.getRepository(Ad
 
 class AdotanteController {
     static async criaAdotante(req: Request, res: Response) {
-        const { nome, celular, endereco } = <TipoAdotante>req.body;
+        const { nome, celular, endereco } = <AdotanteEntity>req.body;
         
         const novoAdotante = new AdotanteEntity(nome, celular, endereco);
 
@@ -22,7 +21,7 @@ class AdotanteController {
     }
 
     static async listaAdotante(req: Request, res: Response) {
-        const listaDeAdotantes: TipoAdotante[] = await adotanteRepository.lista();
+        const listaDeAdotantes: AdotanteEntity[] = await adotanteRepository.lista();
 
         return res.status(200).json({ mensagem: "Aqui estão as pessoas adotantes", adotantes: listaDeAdotantes });
     }
@@ -30,10 +29,10 @@ class AdotanteController {
     static async atualizaAdotante(req: Request, res: Response) {
         const identificador: number = Number(req.params.id);
 
-        const mudancas: TipoAdotante = req.body;
+        const mudancas: AdotanteEntity = req.body;
 
         try {
-            const adotanteIdentificado: TipoAdotante = await adotanteRepository.atualiza(identificador, mudancas);
+            const adotanteIdentificado: AdotanteEntity = await adotanteRepository.atualiza(identificador, mudancas);
             return res.status(200).json({ mensagem: "Adotante atualizado com sucesso", adotante: adotanteIdentificado });
         } catch (erro) {
             return res.status(400).json({ mensagem: `Ocorreu um erro ao tentar atualizar adotante: ${erro}` });

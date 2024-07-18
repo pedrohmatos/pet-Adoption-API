@@ -1,7 +1,11 @@
 import { Repository } from "typeorm";
-import TipoPet from "../types/TipoPet.js";
 import InterfacePetRepository from "./interfaces/InterfacePetRepository.js";
 import PetEntity from "../entity/PetEntity.js";
+import AdotanteRepository from "./AdotanteRepository.js";
+import AppDataSource from "../config/fonteDados.js";
+import AdotanteEntity from "../entity/AdotanteEntity.js";
+
+const adotanteRepository = new AdotanteRepository(AppDataSource.getRepository(AdotanteEntity));
 
 class PetRepository implements InterfacePetRepository {
     private repository: Repository<PetEntity>;
@@ -10,17 +14,17 @@ class PetRepository implements InterfacePetRepository {
         this.repository = receivedRepository;
     }
 
-    async cria(pet: TipoPet): Promise<void> {
+    async cria(pet: PetEntity): Promise<void> {
         await this.repository.save(pet);
     }
 
-    async lista(): Promise<TipoPet[]> {
+    async lista(): Promise<PetEntity[]> {
         return await this.repository.find();
     }
 
-    async atualiza(receivedId: number, receivedPet: TipoPet): Promise<TipoPet> {
+    async atualiza(receivedId: number, receivedPet: PetEntity): Promise<PetEntity> {
 
-        const petIdentificado: TipoPet | null = await this.repository.findOne({
+        const petIdentificado: PetEntity | null = await this.repository.findOne({
             where: {
                 id: receivedId
             }
@@ -36,9 +40,9 @@ class PetRepository implements InterfacePetRepository {
         return novoPet;
     }
 
-    async deleta(receivedId: number): Promise<TipoPet> {
+    async deleta(receivedId: number): Promise<PetEntity> {
 
-        const petIdentificado: TipoPet | null = await this.repository.findOne({
+        const petIdentificado: PetEntity | null = await this.repository.findOne({
             where: {
                 id: receivedId
             }
@@ -54,7 +58,7 @@ class PetRepository implements InterfacePetRepository {
     }
 
     async encontra(receivedId: number) {
-        const petIdentificado: TipoPet | null = await this.repository.findOne({
+        const petIdentificado: PetEntity | null = await this.repository.findOne({
             where: {
                 id: receivedId
             }
@@ -63,6 +67,27 @@ class PetRepository implements InterfacePetRepository {
         if (!petIdentificado) {
             throw new Error().message = `O pet com id: ${receivedId} não foi encontrado`;
         }
+
+        return petIdentificado;
+    }
+
+    async adota(receivedPetId: number, receivedAdotanteId: number): Promise<PetEntity> {
+        const petIdentificado: PetEntity | null = await this.repository.findOne({
+            where: {
+                id: receivedPetId
+            }
+        });
+
+        if (!petIdentificado) {
+            throw new Error().message = `O pet com id: ${receivedPetId} não foi encontrado`;
+        }
+        
+        const adotanteIdentificado = await adotanteRepository.encontra(receivedAdotanteId);
+
+        petIdentificado.adotante = adotanteIdentificado;
+        petIdentificado.adotado = true;
+
+        this.repository.save(petIdentificado);
 
         return petIdentificado;
     }

@@ -1,10 +1,11 @@
-import TipoAdotante from "../../types/TipoAdotante.js";
+import AdotanteEntity from "../../entity/AdotanteEntity.js";
 
 interface IAdotanteRepository {
-    cria(adotante: TipoAdotante): Promise<void>;
-    lista(): Promise<TipoAdotante[]>;
-    atualiza(id: number, mudancas: TipoAdotante): Promise<TipoAdotante>;
+    cria(adotante: AdotanteEntity): Promise<void>;
+    lista(): Promise<AdotanteEntity[]>;
+    atualiza(id: number, mudancas: AdotanteEntity): Promise<AdotanteEntity>;
     deleta(id: number): Promise<void>;
+    encontra(id: number): Promise<AdotanteEntity>;
 }
 
 export default IAdotanteRepository;

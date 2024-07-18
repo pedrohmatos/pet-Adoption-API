@@ -1,11 +1,12 @@
-import TipoPet from "../../types/TipoPet.js";
+import PetEntity from "../../entity/PetEntity.js";
 
 interface InterfacePetRepository {
-    cria(pet: TipoPet): Promise<void>;
-    lista(): Promise<TipoPet[]>;
-    atualiza(id: number, pet: TipoPet): Promise<TipoPet>;
-    deleta(id: number): Promise<TipoPet>;
-    encontra(id: number): Promise<TipoPet>;
+    cria(pet: PetEntity): Promise<void>;
+    lista(): Promise<PetEntity[]>;
+    atualiza(id: number, pet: PetEntity): Promise<PetEntity>;
+    deleta(id: number): Promise<PetEntity>;
+    encontra(id: number): Promise<PetEntity>;
+    adota(petId:number, adotanteId:number): Promise<PetEntity>;
 }
 
 export default InterfacePetRepository

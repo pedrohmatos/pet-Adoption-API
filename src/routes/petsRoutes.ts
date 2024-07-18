@@ -7,6 +7,7 @@ petsRoutes.get("/", PetController.listaPet);
 petsRoutes.get("/:id", PetController.encontraPetPorId);
 petsRoutes.post("/", PetController.criaPet);
 petsRoutes.put("/:id", PetController.atualizaPet);
+petsRoutes.put("/:petId/:adotanteId", PetController.adotaPet);
 petsRoutes.delete("/:id", PetController.deletarPet);
 
 export default petsRoutes;

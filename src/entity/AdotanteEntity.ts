@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import TipoAdotante from "../types/TipoAdotante.js";
+import PetEntity from "./PetEntity.js";
 
 @Entity()
-class AdotanteEntity implements TipoAdotante {
+class AdotanteEntity {
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -14,6 +14,9 @@ class AdotanteEntity implements TipoAdotante {
 
     @Column({ nullable: true })
     endereco?: string;
+
+    @OneToMany(() => PetEntity, (pet) => pet.adotante)
+    pets!: PetEntity[];
 
     constructor(nomeRecebido: string, celularRecebido: string, enderecoRecebido?: string) {
         this.nome = nomeRecebido;
